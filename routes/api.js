@@ -38,6 +38,12 @@ route.get('/blog-stats',(req,res,next)=>{
 route.get('/blog-search',(req,res,next)=>{
     const query  = req.query.query
     console.log(query)
+    if(!query){
+        throw {
+            message:"Provide a query titled 'query' Eg./blog-search?query=privacy",
+            statusCode:404,
+        }
+    }
     axios(process.env.API_URL+'/api/rest/blogs',{
         headers:{
             'x-hasura-admin-secret': process.env.API_SECRET
@@ -48,12 +54,19 @@ route.get('/blog-search',(req,res,next)=>{
         let filteredSearch = result.data.blogs.filter((data)=>{
             return data.title.toLowerCase().includes(query.toLocaleLowerCase())
         })
+        if(filteredSearch.length==0){
+            throw {
+                message:"The search result does not match any of the blog, FilteredContent []",
+                statusCode:201,
+            }
+        }
         return res.status(201).json({
             message:'Data Filtered',
-            filteredBlog:filteredSearch!=[]?filteredSearch:'The search result does not match any of the blog'
+            filteredBlog:filteredSearch
         })
     })
     .catch((err)=>{
+        console.log(err)
         next(err)
     })
 })

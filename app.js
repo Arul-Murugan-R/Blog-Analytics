@@ -16,7 +16,7 @@ app.use((err,req,res,next)=>{
     const statusCode = err.statusCode || 500;
     const message = err.message || 'Something went wrong'
     const errors = err.cons
-    console.log(errors)
+    console.log(err)
     if(errors){
         let output = errors[0].msg
         if(output){
